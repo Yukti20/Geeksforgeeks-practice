@@ -1,0 +1,84 @@
+import math
+import os
+import random
+import re
+import sys
+
+class Book:
+    def __init__(self, title, genre, rating):
+        self.title = title
+        self.genre = genre
+        self.rating = rating
+    
+    def get_title(self):
+        return self.title
+    
+    def get_genre(self):
+        return self.genre
+        
+    def get_rating(self):
+        return self.rating
+        
+class LibraryManagement:
+    def __init__(self):
+        self.books_list = []
+        self.rating_dict = {}
+        self.genre_dict = {}
+        
+    def add_book(self, book):
+        self.books_list.append(book)
+        
+    def get_highest_rated_books(self, x):
+        for i in self.books_list:
+            self.rating_dict[i] = i.get_rating()
+        
+        sorted_dict = {key: value for key, value in sorted(self.rating_dict.items(), key=lambda item: item[1], reverse=True)}
+        
+        ls = list(sorted_dict.keys())[:x]
+        return ls
+        
+    def recommend_top_book_by_genre(self, genre):
+        for i in self.books_list:
+            self.genre_dict[i] = i.get_genre()
+        
+        book_by_genre = [k for k,v in self.genre_dict.items() if v==genre]
+        new_rating_dict = {}
+        for i in book_by_genre:
+            new_rating_dict[i] = i.get_rating()
+        
+        new_sorted_dict = {key: value for key, value in sorted(new_rating_dict.items(), key=lambda item: item[1], reverse=True)}
+        
+        required_book = list(new_sorted_dict.keys())
+        if len(required_book) > 0:
+            return required_book[0]
+        else:
+            pass
+            
+
+def main(path) -> None:
+    fptr = open(path, 'w')
+    num = int(input())
+    library = LibraryManagement()
+    for i in range(num):
+        title, genre, rating = input().split(",")
+        library.add_book(Book(title, genre, float(rating)))
+
+    recommended_count = int(input())
+    genre = input()
+    
+    highest_rated_books = library.get_highest_rated_books(recommended_count)
+    book_by_genre = library.recommend_top_book_by_genre(genre)
+    
+    for book in highest_rated_books:
+        fptr.write(f"Highest Rated Book: {book.title}, Rating: {book.rating}\n")
+
+    if book_by_genre:
+        fptr.write(f"Top Recommended Book in Programming Genre: {book_by_genre.title}, Rating: {book_by_genre.rating}\n")
+    else:
+        fptr.write("No books found in the specified genre.\n")
+    fptr.close()
+
+if __name__ == "__main__":
+    env_var = "OUTPUT_PATH"
+    path = os.environ[env_var] if env_var in os.environ.keys() else "/dev/stdout"
+    main(path)
